@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pure Custom Creation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --gold: #f5c842;
+    --gold2: #e8a020;
+    --text: #f0f0f8;
+    --muted: #7070a0;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --blue: #4a9eff;
+    --radius: 16px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 90px;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1a24 0%, #0f0f18 100%);
+    padding: 50px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(245,200,66,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .brand-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.8;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .header h1 span { color: var(--gold); }
+  .owner-badge {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #13131a;
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 12px 4px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+  .nav-btn .icon { font-size: 20px; }
+  .nav-btn.active { color: var(--gold); }
+
+  /* Pages */
+  .page { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Section title */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 16px 0 10px;
+  }
+
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+  }
+  .stat-card.green::after { background: linear-gradient(90deg, var(--green), #27ae60); }
+  .stat-card.blue::after { background: linear-gradient(90deg, var(--blue), #2980b9); }
+  .stat-card.red::after { background: linear-gradient(90deg, var(--red), #c0392b); }
+  .stat-label { font-size: 10px; color: var(--muted); font-weight: 500; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  /* Client cards */
+  .client-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .client-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+  }
+  .client-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .client-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+  .client-status {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .status-active { background: rgba(46,204,113,0.15); color: var(--green); }
+  .status-pending { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .status-overdue { background: rgba(231,76,60,0.15); color: var(--red); }
+  .client-info { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .client-detail { font-size: 11px; color: var(--muted); }
+  .client-detail span { color: var(--text); font-weight: 500; }
+  .client-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .btn-sm {
+    flex: 1;
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .btn-sm:active { opacity: 0.7; }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+  .btn-outline { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .btn-green { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.2); }
+  .btn-red { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.2); }
+
+  /* Add button */
+  .fab {
+    position: fixed;
+    bottom: 80px; right: 20px;
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none;
+    border-radius: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(245,200,66,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+    z-index: 99;
+  }
+  .fab:active { transform: scale(0.93); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px 20px 40px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--gold); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-cancel {
+    width: 100%;
+    padding: 12px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Order cards */
+  .order-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .order-id { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--gold); }
+  .order-client { font-size: 14px; font-weight: 600; color: var(--text); }
+  .order-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .progress-steps { display: flex; justify-content: space-between; }
+  .step-dot {
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .step-dot.done { color: var(--gold); }
+
+  /* WhatsApp templates */
+  .template-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .template-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .template-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    white-space: pre-line;
+  }
+
+  /* Revenue chart */
+  .chart-bar-container { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin: 12px 0; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .chart-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(180deg, var(--gold), var(--gold2));
+    min-height: 4px;
+    transition: height 0.5s;
+  }
+  .chart-label { font-size: 9px; color: var(--muted); }
+  .chart-val { font-size: 9px; color: var(--gold); font-weight: 700; }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-text { font-size: 13px; line-height: 1.6; }
+
+  /* Delivery schedule */
+  .delivery-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .delivery-left { display: flex; align-items: center; gap: 10px; }
+  .delivery-dot {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(245,200,66,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .delivery-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .delivery-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .delivery-qty {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .delivery-qty-label { font-size: 9px; color: var(--muted); text-align: right; }
+
+  .toast {
+    position: fixed;
+    top: 60px; left: 20px; right: 20px;
+    background: var(--green);
+    color: #000;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 999;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  select.form-input { appearance: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand-tag">Aruna Kaligurathne</div>
+  <h1>Pure <span>Custom</span><br>Creation</h1>
+  <div class="owner-badge">👑 CEO Dashboard</div>
+</div>
+
+<!-- PAGES -->
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="section-title">මාසික Overview</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">මාසික Revenue</div>
+      <div class="stat-value gold" id="stat-revenue">Rs. 0</div>
+      <div class="stat-sub">මේ මාසේ</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Collect කළ</div>
+      <div class="stat-value green" id="stat-paid">Rs. 0</div>
+      <div class="stat-sub">Payments</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value red" id="stat-pending">Rs. 0</div>
+      <div class="stat-sub">Collect කරන්න</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Active Clients</div>
+      <div class="stat-value" id="stat-clients">0</div>
+      <div class="stat-sub">ගනුදෙනුකරුවන්</div>
+    </div>
+  </div>
+
+  <div class="section-title">Revenue Chart</div>
+  <div class="client-card" style="padding:16px;">
+    <div class="chart-bar-container" id="revenue-chart"></div>
+  </div>
+
+  <div class="section-title">ළඟදීම Deliveries</div>
+  <div id="upcoming-deliveries"></div>
+</div>
+
+<!-- CLIENTS -->
+<div class="page" id="page-clients">
+  <div class="section-title">Clients (<span id="client-count">0</span>)</div>
+  <div id="client-list"></div>
+</div>
+
+<!-- ORDERS -->
+<div class="page" id="page-orders">
+  <div class="section-title">Orders (<span id="order-count">0</span>)</div>
+  <div id="order-list"></div>
+</div>
+
+<!-- DELIVERY -->
+<div class="page" id="page-delivery">
+  <div class="section-title">Delivery Schedule</div>
+  <div id="delivery-list"></div>
+</div>
+
+<!-- WHATSAPP -->
+<div class="page" id="page-whatsapp">
+  <div class="section-title">WhatsApp Templates</div>
+
+  <div class="template-card">
+    <div class="template-title">✅ Order Confirm</div>
+    <div class="template-text" id="tpl-confirm">ආයුබෝවන්! 🙏
+
+ඔබේ order confirm වුණා.
+
+📦 Bottles: [qty]
+💰 Total: Rs. [amount]
+📅 Delivery: [date]
+
+Advance: Rs. [advance] receive කළා.
+Balance: Rs. [balance]
+
+Pure Custom Creation | Aruna</div>
+    <button class="btn-sm btn-gold" onclick="copyTemplate('tpl-confirm')">Copy කරන්න 📋</button>
+  </div>
+
+  <div class="template-card">
+    <div class="template-title">🚚 Delivery Notice</div>
+    <div class="template-text" id="tpl-delivery">ආයුබෝවන්! 🙏
+
+ඔබේ bottles අද deliver කරන්නම්.
+
+📦 Quantity: [qty]
+⏰ Time: [time]
+
+Please ready ඉන්න. Balance Rs. [balance] collect කරන්නම්.
+
+Pure Custom Creation | Aruna</div>
+    <button class="btn-sm btn-gold" onclick="copyTemplate('tpl-delivery')">Copy කරන්න 📋</button>
+  </div>
+
+  <div class="template-card">
+    <div class="template-title">💰 Payment Reminder</div>
+    <div class="template-text" id="tpl-payment">ආයුබෝවන්! 🙏
+
+Friendly reminder — ඔබේ balance payment Rs. [amount] pending ඉන්නවා.
+
+Please confirm කරන්නකො. 🙏
+
+Pure Custom Creation | Aruna</div>
+    <button class="btn-sm btn-gold" onclick="copyTemplate('tpl-payment')">Copy කරන්න 📋</button>
+  </div>
+
+  <div class="template-card">
+    <div class="template-title">🔄 Monthly Reorder</div>
+    <div class="template-text" id="tpl-reorder">ආයුබෝවන්! 🙏
+
+මේ මාසේ bottles order confirm කරන්නකො. 😊
+
+Last order: [qty] bottles
+ඔබට මේ වතාවේ කීයක් ඕනෑද?
+
+Pure Custom Creation | Aruna</div>
+    <button class="btn-sm btn-gold" onclick="copyTemplate('tpl-reorder')">Copy කරන්න 📋</button>
+  </div>
+
+  <div class="template-card">
+    <div class="template-title">🆕 New Client Pitch</div>
+    <div class="template-text" id="tpl-pitch">ආයුබෝවන්! 🙏
+
+මම Aruna — Pure Custom Creation founder.
+
+අපි Kandy cafes සඳහා branded water bottles customize කරනවා. Cafe Nuwara, Fab Ceylon, Kandyan Dish වැනි cafes දැනට අපේ clients.
+
+ඔබේ cafe සඳහාත් special branding package එකක් offer කරන්න කැමතියි.
+
+Free sample design එකක් හදලා dෙන්නද? 😊
+
+Pure Custom Creation | Aruna</div>
+    <button class="btn-sm btn-gold" onclick="copyTemplate('tpl-pitch')">Copy කරන්න 📋</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('dashboard', this)">
+    <span class="icon">📊</span>Dashboard
+  </button>
+  <button class="nav-btn" onclick="showPage('clients', this)">
+    <span class="icon">👥</span>Clients
+  </button>
+  <button class="nav-btn" onclick="showPage('orders', this)">
+    <span class="icon">📦</span>Orders
+  </button>
+  <button class="nav-btn" onclick="showPage('delivery', this)">
+    <span class="icon">🚚</span>Delivery
+  </button>
+  <button class="nav-btn" onclick="showPage('whatsapp', this)">
+    <span class="icon">💬</span>Templates
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="openAddModal()">+</button>
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ Client Add කරන්න</div>
+    <div class="form-group">
+      <label class="form-label">Cafe / Business Name</label>
+      <input class="form-input" id="c-name" placeholder="Eg: Cafe Nuwara" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <input class="form-input" id="c-phone" placeholder="07XXXXXXXX" type="tel" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Monthly Bottles</label>
+        <input class="form-input" id="c-bottles" placeholder="500" type="number" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Day</label>
+        <input class="form-input" id="c-day" placeholder="1" type="number" min="1" max="28" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Price per Bottle (Rs.)</label>
+      <input class="form-input" id="c-price" placeholder="35" type="number" />
+    </div>
+    <button class="btn-primary" onclick="addClient()">Save කරන්න ✓</button>
+    <button class="btn-cancel" onclick="closeModal('modal-client')">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD ORDER MODAL -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📦 Order Add කරන්න</div>
+    <div class="form-group">
+      <label class="form-label">Client</label>
+      <select class="form-input" id="o-client"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Bottles (qty)</label>
+        <input class="form-input" id="o-qty" placeholder="500" type="number" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price/bottle (Rs.)</label>
+        <input class="form-input" id="o-price" placeholder="35" type="number" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Advance (Rs.)</label>
+        <input class="form-input" id="o-advance" placeholder="0" type="number" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Date</label>
+        <input class="form-input" id="o-date" type="date" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="o-status">
+        <option value="0">Lead Generation</option>
+        <option value="1">Requirement Capture</option>
+        <option value="2">Quotation Sent</option>
+        <option value="3">Design Stage</option>
+        <option value="4">Production</option>
+        <option value="5">Delivered</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="addOrder()">Save කරන්න ✓</button>
+    <button class="btn-cancel" onclick="closeModal('modal-order')">Cancel</button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💰 Payment Mark කරන්න</div>
+    <div id="payment-order-info" style="background:var(--card);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--muted);"></div>
+    <div class="form-group">
+      <label class="form-label">Receive කළ Amount (Rs.)</label>
+      <input class="form-input" id="pay-amount" placeholder="0" type="number" />
+    </div>
+    <button class="btn-primary" onclick="markPayment()">Confirm ✓</button>
+    <button class="btn-cancel" onclick="closeModal('modal-payment')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+let data = JSON.parse(localStorage.getItem('pcc_data') || '{"clients":[],"orders":[],"payments":[]}');
+let currentPaymentOrderId = null;
+let currentPage = 'dashboard';
+
+function save() {
+  localStorage.setItem('pcc_data', JSON.stringify(data));
+}
+
+// Seed default clients if empty
+if (data.clients.length === 0) {
+  const defaultClients = [
+    { id: 'c1', name: 'Cafe Nuwara & Fab Ceylon', phone: '', bottles: 0, day: 1, price: 35 },
+    { id: 'c2', name: 'Seema Cafe & Restaurant', phone: '', bottles: 0, day: 5, price: 35 },
+    { id: 'c3', name: 'Devine Street Cafe', phone: '', bottles: 0, day: 8, price: 35 },
+    { id: 'c4', name: 'Kandyan Dish', phone: '', bottles: 0, day: 10, price: 35 },
+    { id: 'c5', name: 'Chill Kandy Cafe', phone: '', bottles: 0, day: 15, price: 35 },
+  ];
+  data.clients = defaultClients;
+  save();
+}
+
+// ===== NAV =====
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  currentPage = page;
+  renderPage(page);
+  // Hide FAB on whatsapp/delivery
+  document.getElementById('fab-btn').style.display = (page === 'whatsapp') ? 'none' : 'flex';
+}
+
+function renderPage(page) {
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'clients') renderClients();
+  else if (page === 'orders') renderOrders();
+  else if (page === 'delivery') renderDelivery();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+
+  const monthOrders = data.orders.filter(o => {
+    const d = new Date(o.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+
+  const totalRevenue = monthOrders.reduce((s, o) => s + (o.qty * o.price), 0);
+  const totalPaid = monthOrders.reduce((s, o) => s + (o.paid || 0), 0);
+  const totalPending = totalRevenue - totalPaid;
+
+  document.getElementById('stat-revenue').textContent = 'Rs. ' + totalRevenue.toLocaleString();
+  document.getElementById('stat-paid').textContent = 'Rs. ' + totalPaid.toLocaleString();
+  document.getElementById('stat-pending').textContent = 'Rs. ' + totalPending.toLocaleString();
+  document.getElementById('stat-clients').textContent = data.clients.length;
+
+  // Chart - last 6 months
+  const chart = document.getElementById('revenue-chart');
+  chart.innerHTML = '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let chartData = [];
+  for (let i = 5; i >= 0; i--) {
+    let m = month - i;
+    let y = year;
+    if (m < 0) { m += 12; y--; }
+    const rev = data.orders
+      .filter(o => { const d = new Date(o.date); return d.getMonth() === m && d.getFullYear() === y; })
+      .reduce((s, o) => s + (o.qty * o.price), 0);
+    chartData.push({ label: months[m], value: rev });
+  }
+  const maxVal = Math.max(...chartData.map(d => d.value), 1);
+  chartData.forEach(d => {
+    const wrap = document.createElement('div');
+    wrap.className = 'chart-bar-wrap';
+    const pct = Math.max((d.value / maxVal) * 90, d.value > 0 ? 8 : 2);
+    wrap.innerHTML = `
+      <div class="chart-val">${d.value > 0 ? (d.value/1000).toFixed(0)+'k' : ''}</div>
+      <div class="chart-bar" style="height:${pct}px"></div>
+      <div class="chart-label">${d.label}</div>
+    `;
+    chart.appendChild(wrap);
+  });
+
+  // Upcoming deliveries
+  const upcomingDiv = document.getElementById('upcoming-deliveries');
+  const today = now.getDate();
+  const upcoming = data.clients
+    .filter(c => c.bottles > 0)
+    .map(c => ({
+      ...c,
+      daysLeft: c.day >= today ? c.day - today : (28 - today + c.day)
+    }))
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 4);
+
+  if (upcoming.length === 0) {
+    upcomingDiv.innerHTML = '<div class="empty"><div class="empty-icon">🚚</div><div class="empty-text">Delivery schedule set කරලා නෑ.<br>Clients edit කරන්න.</div></div>';
+  } else {
+    upcomingDiv.innerHTML = upcoming.map(c => `
+      <div class="delivery-row">
+        <div class="delivery-left">
+          <div class="delivery-dot">🏪</div>
+          <div>
+            <div class="delivery-name">${c.name}</div>
+            <div class="delivery-date">${c.daysLeft === 0 ? '⚡ අදමයි!' : c.daysLeft + ' දිනකින්'} · Day ${c.day}</div>
+          </div>
+        </div>
+        <div>
+          <div class="delivery-qty">${c.bottles || '?'}</div>
+          <div class="delivery-qty-label">bottles</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// ===== CLIENTS =====
+function renderClients() {
+  document.getElementById('client-count').textContent = data.clients.length;
+  const list = document.getElementById('client-list');
+  if (data.clients.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Clients නෑ.<br>+ button එකෙන් add කරන්න.</div></div>';
+    return;
+  }
+  list.innerHTML = data.clients.map(c => {
+    const clientOrders = data.orders.filter(o => o.clientId === c.id);
+    const totalRevenue = clientOrders.reduce((s, o) => s + (o.qty * o.price), 0);
+    const pending = clientOrders.reduce((s, o) => s + ((o.qty * o.price) - (o.paid || 0)), 0);
+    return `
+    <div class="client-card">
+      <div class="client-top">
+        <div class="client-name">${c.name}</div>
+        <div class="client-status status-active">Active</div>
+      </div>
+      <div class="client-info">
+        <div class="client-detail">📱 <span>${c.phone || 'නෑ'}</span></div>
+        <div class="client-detail">📅 Day <span>${c.day || '?'}</span></div>
+        <div class="client-detail">📦 <span>${c.bottles || '?'} btl/mo</span></div>
+        <div class="client-detail">💰 Pending <span style="color:var(--red)">Rs.${pending.toLocaleString()}</span></div>
+      </div>
+      <div class="client-actions">
+        <button class="btn-sm btn-green" onclick="callClient('${c.phone}')">📞 Call</button>
+        <button class="btn-sm btn-outline" onclick="editClient('${c.id}')">✏️ Edit</button>
+        <button class="btn-sm btn-red" onclick="deleteClient('${c.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function callClient(phone) {
+  if (phone) window.location.href = 'tel:' + phone;
+  else showToast('Phone number නෑ. Edit කරන්න.');
+}
+
+function deleteClient(id) {
+  if (confirm('Delete කරන්නද?')) {
+    data.clients = data.clients.filter(c => c.id !== id);
+    save(); renderClients();
+  }
+}
+
+function editClient(id) {
+  const c = data.clients.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('c-name').value = c.name;
+  document.getElementById('c-phone').value = c.phone;
+  document.getElementById('c-bottles').value = c.bottles;
+  document.getElementById('c-day').value = c.day;
+  document.getElementById('c-price').value = c.price;
+  // Temporarily store editing id
+  document.getElementById('modal-client').dataset.editId = id;
+  document.getElementById('modal-client').classList.add('open');
+}
+
+// ===== ORDERS =====
+const STAGES = ['Lead', 'Capture', 'Quote', 'Design', 'Production', 'Delivered'];
+
+function renderOrders() {
+  document.getElementById('order-count').textContent = data.orders.length;
+  const list = document.getElementById('order-list');
+  if (data.orders.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Orders නෑ.<br>+ button එකෙන් add කරන්න.</div></div>';
+    return;
+  }
+  const sorted = [...data.orders].reverse();
+  list.innerHTML = sorted.map(o => {
+    const client = data.clients.find(c => c.id === o.clientId);
+    const total = o.qty * o.price;
+    const paid = o.paid || 0;
+    const balance = total - paid;
+    const progress = ((o.status + 1) / 6) * 100;
+    return `
+    <div class="order-card">
+      <div class="order-top">
+        <div class="order-id">#${o.id}</div>
+        <div class="client-status ${o.status === 5 ? 'status-active' : 'status-pending'}">${STAGES[o.status]}</div>
+      </div>
+      <div class="order-client">${client ? client.name : 'Unknown'}</div>
+      <div class="order-meta">
+        <div class="tag">📦 ${o.qty} btl</div>
+        <div class="tag">💰 Rs.${total.toLocaleString()}</div>
+        <div class="tag" style="color:${balance > 0 ? 'var(--red)' : 'var(--green)'}">Balance Rs.${balance.toLocaleString()}</div>
+        <div class="tag">📅 ${o.date || 'N/A'}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+      <div class="progress-steps">
+        ${STAGES.map((s, i) => `<div class="step-dot ${i <= o.status ? 'done' : ''}">${s}</div>`).join('')}
+      </div>
+      <div class="client-actions" style="margin-top:10px;">
+        ${o.status < 5 ? `<button class="btn-sm btn-outline" onclick="advanceOrder('${o.id}')">▶ Next Stage</button>` : ''}
+        ${balance > 0 ? `<button class="btn-sm btn-green" onclick="openPayment('${o.id}')">💰 Payment</button>` : ''}
+        <button class="btn-sm btn-red" onclick="deleteOrder('${o.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function advanceOrder(id) {
+  const o = data.orders.find(x => x.id === id);
+  if (o && o.status < 5) { o.status++; save(); renderOrders(); showToast('Stage updated! ✓'); }
+}
+
+function deleteOrder(id) {
+  if (confirm('Delete කරන්නද?')) {
+    data.orders = data.orders.filter(o => o.id !== id);
+    save(); renderOrders();
+  }
+}
+
+function openPayment(id) {
+  currentPaymentOrderId = id;
+  const o = data.orders.find(x => x.id === id);
+  const client = data.clients.find(c => c.id === o.clientId);
+  const total = o.qty * o.price;
+  const balance = total - (o.paid || 0);
+  document.getElementById('payment-order-info').innerHTML = `
+    <b>${client ? client.name : ''}</b><br>
+    Total: Rs.${total.toLocaleString()} | Paid: Rs.${(o.paid||0).toLocaleString()} | <b>Balance: Rs.${balance.toLocaleString()}</b>
+  `;
+  document.getElementById('pay-amount').value = balance;
+  document.getElementById('modal-payment').classList.add('open');
+}
+
+function markPayment() {
+  const o = data.orders.find(x => x.id === currentPaymentOrderId);
+  const amt = parseFloat(document.getElementById('pay-amount').value) || 0;
+  if (o) {
+    o.paid = (o.paid || 0) + amt;
+    save(); closeModal('modal-payment'); renderOrders();
+    showToast('Rs.' + amt.toLocaleString() + ' marked! ✓');
+  }
+}
+
+// ===== DELIVERY =====
+function renderDelivery() {
+  const list = document.getElementById('delivery-list');
+  const now = new Date();
+  const today = now.getDate();
+  const withDays = data.clients
+    .filter(c => c.bottles > 0)
+    .map(c => ({
+      ...c,
+      daysLeft: c.day >= today ? c.day - today : (28 - today + c.day)
+    }))
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+
+  if (withDays.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🚚</div><div class="empty-text">Delivery schedule නෑ.<br>Clients edit කරලා bottles set කරන්න.</div></div>';
+    return;
+  }
+
+  list.innerHTML = withDays.map(c => `
+    <div class="delivery-row">
+      <div class="delivery-left">
+        <div class="delivery-dot">🏪</div>
+        <div>
+          <div class="delivery-name">${c.name}</div>
+          <div class="delivery-date">
+            ${c.daysLeft === 0 ? '⚡ අදමයි!' : c.daysLeft + ' දිනකින්'} · Day ${c.day} · Rs.${(c.bottles * c.price).toLocaleString()}
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="delivery-qty">${c.bottles}</div>
+        <div class="delivery-qty-label">bottles</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== MODAL =====
+function openAddModal() {
+  if (currentPage === 'clients' || currentPage === 'dashboard' || currentPage === 'delivery') {
+    document.getElementById('modal-client').dataset.editId = '';
+    document.getElementById('c-name').value = '';
+    document.getElementById('c-phone').value = '';
+    document.getElementById('c-bottles').value = '';
+    document.getElementById('c-day').value = '';
+    document.getElementById('c-price').value = '35';
+    document.getElementById('modal-client').classList.add('open');
+  } else if (currentPage === 'orders') {
+    // Populate client dropdown
+    const sel = document.getElementById('o-client');
+    sel.innerHTML = data.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    // Set today as default date
+    document.getElementById('o-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modal-order').classList.add('open');
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function addClient() {
+  const name = document.getElementById('c-name').value.trim();
+  if (!name) { showToast('Name ලියන්න!'); return; }
+  const editId = document.getElementById('modal-client').dataset.editId;
+  if (editId) {
+    const c = data.clients.find(x => x.id === editId);
+    if (c) {
+      c.name = name;
+      c.phone = document.getElementById('c-phone').value.trim();
+      c.bottles = parseInt(document.getElementById('c-bottles').value) || 0;
+      c.day = parseInt(document.getElementById('c-day').value) || 1;
+      c.price = parseFloat(document.getElementById('c-price').value) || 35;
+    }
+  } else {
+    data.clients.push({
+      id: 'c' + Date.now(),
+      name,
+      phone: document.getElementById('c-phone').value.trim(),
+      bottles: parseInt(document.getElementById('c-bottles').value) || 0,
+      day: parseInt(document.getElementById('c-day').value) || 1,
+      price: parseFloat(document.getElementById('c-price').value) || 35,
+    });
+  }
+  save();
+  closeModal('modal-client');
+  renderClients();
+  showToast('Client saved! ✓');
+}
+
+function addOrder() {
+  const clientId = document.getElementById('o-client').value;
+  const qty = parseInt(document.getElementById('o-qty').value) || 0;
+  const price = parseFloat(document.getElementById('o-price').value) || 0;
+  if (!qty || !price) { showToast('Qty & Price ලියන්න!'); return; }
+  const advance = parseFloat(document.getElementById('o-advance').value) || 0;
+  data.orders.push({
+    id: 'ORD' + String(data.orders.length + 1).padStart(3, '0'),
+    clientId,
+    qty,
+    price,
+    paid: advance,
+    date: document.getElementById('o-date').value,
+    status: parseInt(document.getElementById('o-status').value),
+  });
+  save();
+  closeModal('modal-order');
+  renderOrders();
+  showToast('Order added! ✓');
+}
+
+// ===== UTILITIES =====
+function copyTemplate(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied! WhatsApp paste කරන්න 📋'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// Init
+renderDashboard();
+</script>
+</body>
+</html>
