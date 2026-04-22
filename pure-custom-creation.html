@@ -1,65 +1,505 @@
-Aruna Kaligurathne
-Pure Custom
-Creation
-👑 CEO Dashboard
-☁️ Cloud Synced
-මාසික Overview
-මාසික Revenue
-Rs. 0
-මේ මාසේ
-Collect කළ
-Rs. 0
-Payments
-Pending
-Rs. 0
-Collect කරන්න
-Active Clients
-0
-ගනුදෙනුකරුවන්
-Revenue Chart
-Nov
-Dec
-Jan
-Feb
-Mar
-Apr
-ළඟදීම Deliveries
-🚚
-Delivery schedule නෑ.
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pure Custom Creation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#0a0a0f;--surface:#13131a;--card:#1a1a24;--border:#2a2a3a;--gold:#f5c842;--gold2:#e8a020;--text:#f0f0f8;--muted:#7070a0;--green:#2ecc71;--red:#e74c3c;--blue:#4a9eff;--radius:16px}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:90px;overflow-x:hidden}
+  .header{background:linear-gradient(135deg,#1a1a24 0%,#0f0f18 100%);padding:50px 20px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+  .header::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(245,200,66,0.12) 0%,transparent 70%);border-radius:50%}
+  .brand-tag{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;opacity:.8}
+  .header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);line-height:1.2}
+  .header h1 span{color:var(--gold)}
+  .badges{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .owner-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);padding:5px 12px;border-radius:20px;font-size:12px;color:var(--gold);font-weight:500}
+  .sync-badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
+  .sync-ok{background:rgba(46,204,113,0.15);color:var(--green)}
+  .sync-err{background:rgba(231,76,60,0.15);color:var(--red)}
+  .sync-wait{background:rgba(245,200,66,0.15);color:var(--gold)}
+  .nav{position:fixed;bottom:0;left:0;right:0;background:#13131a;border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+  .nav-btn{flex:1;padding:12px 4px;border:none;background:none;color:var(--muted);font-size:9px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:color .2s}
+  .nav-btn .icon{font-size:20px}
+  .nav-btn.active{color:var(--gold)}
+  .page{display:none;padding:16px;animation:fadeIn .2s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:16px 0 10px}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+  .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+  .stat-card.green::after{background:linear-gradient(90deg,var(--green),#27ae60)}
+  .stat-card.blue::after{background:linear-gradient(90deg,var(--blue),#2980b9)}
+  .stat-card.red::after{background:linear-gradient(90deg,var(--red),#c0392b)}
+  .stat-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:6px}
+  .stat-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
+  .stat-value.gold{color:var(--gold)}.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}
+  .stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+  .client-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+  .client-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .client-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .client-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+  .badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600}
+  .badge-active{background:rgba(46,204,113,0.15);color:var(--green)}
+  .badge-pending{background:rgba(245,200,66,0.15);color:var(--gold)}
+  .client-info{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+  .client-detail{font-size:11px;color:var(--muted)}
+  .client-detail span{color:var(--text);font-weight:500}
+  .client-actions{display:flex;gap:6px;margin-top:10px}
+  .btn-sm{flex:1;padding:7px;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+  .btn-sm:active{opacity:.7}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
+  .btn-outline{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--border)}
+  .btn-green{background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.2)}
+  .btn-red{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.2)}
+  .fab{position:fixed;bottom:80px;right:20px;width:52px;height:52px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:16px;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(245,200,66,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s;z-index:99}
+  .fab:active{transform:scale(.93)}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 20px 40px;animation:slideUp .3s ease}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+  .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px;color:var(--text)}
+  .form-group{margin-bottom:12px}
+  .form-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:6px;display:block}
+  .form-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;appearance:none}
+  .form-input:focus{border-color:var(--gold)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:12px;color:#000;font-size:15px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;margin-top:8px}
+  .btn-cancel{width:100%;padding:12px;background:none;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:14px;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif}
+  .order-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+  .order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .order-ref{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--gold)}
+  .order-client{font-size:14px;font-weight:600;color:var(--text)}
+  .order-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .tag{font-size:10px;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--muted);font-weight:500}
+  .progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:8px 0}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px}
+  .progress-steps{display:flex;justify-content:space-between}
+  .step-dot{font-size:9px;color:var(--muted);font-weight:500}
+  .step-dot.done{color:var(--gold)}
+  .template-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+  .template-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px}
+  .template-text{font-size:12px;color:var(--muted);line-height:1.6;background:rgba(255,255,255,.03);border-radius:8px;padding:10px;margin-bottom:8px;white-space:pre-line}
+  .chart-bar-container{display:flex;align-items:flex-end;gap:6px;height:100px;margin:12px 0}
+  .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .chart-bar{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold2));min-height:4px}
+  .chart-label{font-size:9px;color:var(--muted)}
+  .chart-val{font-size:9px;color:var(--gold);font-weight:700}
+  .empty{text-align:center;padding:40px 20px;color:var(--muted)}
+  .empty-icon{font-size:40px;margin-bottom:10px}
+  .empty-text{font-size:13px;line-height:1.6}
+  .delivery-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+  .delivery-left{display:flex;align-items:center;gap:10px}
+  .delivery-dot{width:36px;height:36px;border-radius:10px;background:rgba(245,200,66,.1);display:flex;align-items:center;justify-content:center;font-size:16px}
+  .delivery-name{font-size:13px;font-weight:600;color:var(--text)}
+  .delivery-date{font-size:11px;color:var(--muted);margin-top:2px}
+  .delivery-qty{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold)}
+  .delivery-qty-label{font-size:9px;color:var(--muted);text-align:right}
+  .toast{position:fixed;top:60px;left:20px;right:20px;background:var(--green);color:#000;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .toast.err{background:var(--red);color:#fff}
+  .loading{position:fixed;inset:0;background:rgba(10,10,15,.95);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  .loading.hidden{display:none}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{color:var(--muted);font-size:13px}
+  .setup-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:20px 0;text-align:center}
+  .setup-box p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+</style>
+</head>
+<body>
 
-📊
-Dashboard
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Cloud connect වෙනවා...</div>
+</div>
 
-👥
-Clients
+<div class="header">
+  <div class="brand-tag">Aruna Kaligurathne</div>
+  <h1>Pure <span>Custom</span><br>Creation</h1>
+  <div class="badges">
+    <div class="owner-badge">👑 CEO Dashboard</div>
+    <div class="sync-badge sync-wait" id="sync-badge">⏳ Connecting...</div>
+  </div>
+</div>
 
-📦
-Orders
+<div class="page active" id="page-dashboard">
+  <div class="section-title">මාසික Overview</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">මාසික Revenue</div><div class="stat-value gold" id="stat-revenue">Rs. 0</div><div class="stat-sub">මේ මාසේ</div></div>
+    <div class="stat-card green"><div class="stat-label">Collect කළ</div><div class="stat-value green" id="stat-paid">Rs. 0</div><div class="stat-sub">Payments</div></div>
+    <div class="stat-card red"><div class="stat-label">Pending</div><div class="stat-value red" id="stat-pending">Rs. 0</div><div class="stat-sub">Collect කරන්න</div></div>
+    <div class="stat-card blue"><div class="stat-label">Active Clients</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">ගනුදෙනුකරුවන්</div></div>
+  </div>
+  <div class="section-title">Revenue Chart</div>
+  <div class="client-card" style="padding:16px"><div class="chart-bar-container" id="revenue-chart"></div></div>
+  <div class="section-title">ළඟදීම Deliveries</div>
+  <div id="upcoming-deliveries"></div>
+</div>
 
-🚚
-Delivery
+<div class="page" id="page-clients">
+  <div class="section-title">Clients (<span id="client-count">0</span>)</div>
+  <div id="client-list"></div>
+</div>
 
-💬
-Templates
-+create table clients (
-  id uuid default gen_random_uuid() primary key,
-  name text not null,
-  phone text,
-  monthly_bottles int default 0,
-  delivery_day int default 1,
-  price_per_bottle numeric default 35,
-  created_at timestamptz default now()
-);
+<div class="page" id="page-orders">
+  <div class="section-title">Orders (<span id="order-count">0</span>)</div>
+  <div id="order-list"></div>
+</div>
 
-create table orders (
-  id uuid default gen_random_uuid() primary key,
-  client_id uuid references clients(id),
-  order_ref text,
-  qty int,
-  price_per_bottle numeric,
-  paid numeric default 0,
-  order_date date,
-  delivery_date date,
-  stage int default 0,
-  created_at timestamptz default now()
-);
+<div class="page" id="page-delivery">
+  <div class="section-title">Delivery Schedule</div>
+  <div id="delivery-list"></div>
+</div>
+
+<div class="page" id="page-whatsapp">
+  <div class="section-title">WhatsApp Templates</div>
+  <div class="template-card"><div class="template-title">✅ Order Confirm</div><div class="template-text" id="t1">ආයුබෝවන්! 🙏
+
+ඔබේ order confirm වුණා.
+
+📦 Bottles: [qty]
+💰 Total: Rs. [amount]
+📅 Delivery: [date]
+
+Advance: Rs. [advance] receive කළා.
+Balance: Rs. [balance]
+
+Pure Custom Creation | Aruna</div><button class="btn-sm btn-gold" onclick="copyTpl('t1')">Copy 📋</button></div>
+  <div class="template-card"><div class="template-title">🚚 Delivery Notice</div><div class="template-text" id="t2">ආයුබෝවන්! 🙏
+
+ඔබේ bottles අද deliver කරන්නම්.
+
+📦 Quantity: [qty]
+⏰ Time: [time]
+
+Balance Rs. [balance] collect කරන්නම්.
+
+Pure Custom Creation | Aruna</div><button class="btn-sm btn-gold" onclick="copyTpl('t2')">Copy 📋</button></div>
+  <div class="template-card"><div class="template-title">💰 Payment Reminder</div><div class="template-text" id="t3">ආයුබෝවන්! 🙏
+
+Balance payment Rs. [amount] pending ඉන්නවා.
+
+Please confirm කරන්නකො. 🙏
+
+Pure Custom Creation | Aruna</div><button class="btn-sm btn-gold" onclick="copyTpl('t3')">Copy 📋</button></div>
+  <div class="template-card"><div class="template-title">🔄 Monthly Reorder</div><div class="template-text" id="t4">ආයුබෝවන්! 🙏
+
+මේ මාසේ bottles order confirm කරන්නකො. 😊
+
+Last order: [qty] bottles
+මේ වතාවේ කීයක් ඕනෑද?
+
+Pure Custom Creation | Aruna</div><button class="btn-sm btn-gold" onclick="copyTpl('t4')">Copy 📋</button></div>
+  <div class="template-card"><div class="template-title">🆕 New Client Pitch</div><div class="template-text" id="t5">ආයුබෝවන්! 🙏
+
+මම Aruna — Pure Custom Creation founder.
+
+Kandy cafes සඳහා branded water bottles customize කරනවා. Cafe Nuwara, Fab Ceylon, Kandyan Dish දැනට අපේ clients.
+
+ඔබේ cafe සඳහාත් special package offer කරන්න කැමතියි. Free sample design හදලා දෙන්නද? 😊
+
+Pure Custom Creation | Aruna</div><button class="btn-sm btn-gold" onclick="copyTpl('t5')">Copy 📋</button></div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('dashboard',this)"><span class="icon">📊</span>Dashboard</button>
+  <button class="nav-btn" onclick="showPage('clients',this)"><span class="icon">👥</span>Clients</button>
+  <button class="nav-btn" onclick="showPage('orders',this)"><span class="icon">📦</span>Orders</button>
+  <button class="nav-btn" onclick="showPage('delivery',this)"><span class="icon">🚚</span>Delivery</button>
+  <button class="nav-btn" onclick="showPage('whatsapp',this)"><span class="icon">💬</span>Templates</button>
+</nav>
+<button class="fab" id="fab" onclick="openAdd()">+</button>
+
+<!-- CLIENT MODAL -->
+<div class="modal-overlay" id="m-client">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ Client</div>
+    <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="c-name" placeholder="Cafe Nuwara"/></div>
+    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="c-phone" type="tel" placeholder="07XXXXXXXX"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Monthly Bottles</label><input class="form-input" id="c-bottles" type="number" placeholder="500"/></div>
+      <div class="form-group"><label class="form-label">Delivery Day</label><input class="form-input" id="c-day" type="number" placeholder="1" min="1" max="28"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Price/Bottle (Rs.)</label><input class="form-input" id="c-price" type="number" placeholder="35"/></div>
+    <button class="btn-primary" onclick="saveClient()">Save ✓</button>
+    <button class="btn-cancel" onclick="closeM('m-client')">Cancel</button>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="m-order">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📦 Order</div>
+    <div class="form-group"><label class="form-label">Client</label><select class="form-input" id="o-client"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Bottles</label><input class="form-input" id="o-qty" type="number" placeholder="500"/></div>
+      <div class="form-group"><label class="form-label">Price/btl</label><input class="form-input" id="o-price" type="number" placeholder="35"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Advance (Rs.)</label><input class="form-input" id="o-advance" type="number" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label">Delivery Date</label><input class="form-input" id="o-date" type="date"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Stage</label>
+      <select class="form-input" id="o-stage">
+        <option value="0">Lead Generation</option><option value="1">Requirement</option><option value="2">Quotation</option><option value="3">Design</option><option value="4">Production</option><option value="5">Delivered</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="saveOrder()">Save ✓</button>
+    <button class="btn-cancel" onclick="closeM('m-order')">Cancel</button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="m-pay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💰 Payment</div>
+    <div id="pay-info" style="background:var(--card);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--muted)"></div>
+    <div class="form-group"><label class="form-label">Amount (Rs.)</label><input class="form-input" id="pay-amt" type="number"/></div>
+    <button class="btn-primary" onclick="confirmPay()">Confirm ✓</button>
+    <button class="btn-cancel" onclick="closeM('m-pay')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL='https://nuuzvrjkkrvvplltnigo.supabase.co';
+const SUPABASE_KEY='sb_publishable_vKso3PUZBusBKFr3sBFo2A_EopQ6x3u';
+const {createClient}=supabase;
+const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let clients=[],orders=[],payOrderId=null,curPage='dashboard';
+const STAGES=['Lead','Capture','Quote','Design','Production','Delivered'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+async function init(){
+  setLoading(true,'Cloud connect වෙනවා...');
+  try{
+    await loadAll();
+    setSyncBadge(true);
+  }catch(e){
+    setSyncBadge(false);
+    toast('Table setup ඕනෑ. පහල instructions බලන්න.',true);
+    loadLocal();
+  }
+  setLoading(false);
+  renderDash();
+}
+
+async function loadAll(){
+  const[{data:c,error:ce},{data:o,error:oe}]=await Promise.all([
+    db.from('clients').select('*').order('created_at',{ascending:true}),
+    db.from('orders').select('*').order('created_at',{ascending:false})
+  ]);
+  if(ce)throw ce;
+  if(oe)throw oe;
+  clients=c||[];orders=o||[];
+  localStorage.setItem('pcc_c',JSON.stringify(clients));
+  localStorage.setItem('pcc_o',JSON.stringify(orders));
+}
+
+function loadLocal(){
+  clients=JSON.parse(localStorage.getItem('pcc_c')||'[]');
+  orders=JSON.parse(localStorage.getItem('pcc_o')||'[]');
+  if(!clients.length) clients=[
+    {id:'c1',name:'Cafe Nuwara & Fab Ceylon',phone:'',monthly_bottles:0,delivery_day:1,price_per_bottle:35},
+    {id:'c2',name:'Seema Cafe & Restaurant',phone:'',monthly_bottles:0,delivery_day:5,price_per_bottle:35},
+    {id:'c3',name:'Devine Street Cafe',phone:'',monthly_bottles:0,delivery_day:8,price_per_bottle:35},
+    {id:'c4',name:'Kandyan Dish',phone:'',monthly_bottles:0,delivery_day:10,price_per_bottle:35},
+    {id:'c5',name:'Chill Kandy Cafe',phone:'',monthly_bottles:0,delivery_day:15,price_per_bottle:35},
+  ];
+}
+
+function setSyncBadge(ok){
+  const b=document.getElementById('sync-badge');
+  b.className='sync-badge '+(ok?'sync-ok':'sync-err');
+  b.textContent=ok?'☁️ Cloud Synced':'⚠️ Offline Mode';
+}
+
+function setLoading(v,txt=''){
+  const el=document.getElementById('loading');
+  el.className=v?'loading':'loading hidden';
+  if(txt) document.getElementById('loading-text').textContent=txt;
+}
+
+function showPage(p,btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  btn.classList.add('active');
+  curPage=p;
+  if(p==='dashboard')renderDash();
+  else if(p==='clients')renderClients();
+  else if(p==='orders')renderOrders();
+  else if(p==='delivery')renderDelivery();
+  document.getElementById('fab').style.display=p==='whatsapp'?'none':'flex';
+}
+
+function renderDash(){
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  const mo=orders.filter(o=>{const d=new Date(o.order_date);return d.getMonth()===m&&d.getFullYear()===y});
+  const rev=mo.reduce((s,o)=>s+(o.qty*o.price_per_bottle),0);
+  const paid=mo.reduce((s,o)=>s+(o.paid||0),0);
+  document.getElementById('stat-revenue').textContent='Rs. '+rev.toLocaleString();
+  document.getElementById('stat-paid').textContent='Rs. '+paid.toLocaleString();
+  document.getElementById('stat-pending').textContent='Rs. '+(rev-paid).toLocaleString();
+  document.getElementById('stat-clients').textContent=clients.length;
+  const chart=document.getElementById('revenue-chart');chart.innerHTML='';
+  let cd=[];
+  for(let i=5;i>=0;i--){let mx=m-i,yx=y;if(mx<0){mx+=12;yx--;}
+    const rv=orders.filter(o=>{const d=new Date(o.order_date);return d.getMonth()===mx&&d.getFullYear()===yx}).reduce((s,o)=>s+(o.qty*o.price_per_bottle),0);
+    cd.push({l:MONTHS[mx],v:rv});}
+  const mx2=Math.max(...cd.map(d=>d.v),1);
+  cd.forEach(d=>{const w=document.createElement('div');w.className='chart-bar-wrap';
+    const h=Math.max((d.v/mx2)*90,d.v>0?8:2);
+    w.innerHTML=`<div class="chart-val">${d.v>0?(d.v/1000).toFixed(0)+'k':''}</div><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${d.l}</div>`;
+    chart.appendChild(w);});
+  const td=now.getDate();
+  const up=clients.filter(c=>c.monthly_bottles>0).map(c=>({...c,dl:c.delivery_day>=td?c.delivery_day-td:(28-td+c.delivery_day)})).sort((a,b)=>a.dl-b.dl).slice(0,4);
+  document.getElementById('upcoming-deliveries').innerHTML=up.length?up.map(c=>`<div class="delivery-row"><div class="delivery-left"><div class="delivery-dot">🏪</div><div><div class="delivery-name">${c.name}</div><div class="delivery-date">${c.dl===0?'⚡ අදමයි!':c.dl+' දිනකින්'} · Day ${c.delivery_day}</div></div></div><div><div class="delivery-qty">${c.monthly_bottles}</div><div class="delivery-qty-label">bottles</div></div></div>`).join(''):'<div class="empty"><div class="empty-icon">🚚</div><div class="empty-text">Delivery schedule නෑ.</div></div>';
+}
+
+function renderClients(){
+  document.getElementById('client-count').textContent=clients.length;
+  const list=document.getElementById('client-list');
+  if(!clients.length){list.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Clients නෑ.<br>+ button add කරන්න.</div></div>';return;}
+  list.innerHTML=clients.map(c=>{
+    const pending=orders.filter(o=>o.client_id===c.id).reduce((s,o)=>s+((o.qty*o.price_per_bottle)-(o.paid||0)),0);
+    return`<div class="client-card"><div class="client-top"><div class="client-name">${c.name}</div><div class="badge badge-active">Active</div></div>
+    <div class="client-info"><div class="client-detail">📱 <span>${c.phone||'නෑ'}</span></div><div class="client-detail">📅 Day <span>${c.delivery_day}</span></div><div class="client-detail">📦 <span>${c.monthly_bottles} btl/mo</span></div><div class="client-detail">💰 <span style="color:var(--red)">Rs.${pending.toLocaleString()}</span></div></div>
+    <div class="client-actions"><button class="btn-sm btn-green" onclick="callC('${c.phone}')">📞 Call</button><button class="btn-sm btn-outline" onclick="editC('${c.id}')">✏️ Edit</button><button class="btn-sm btn-red" onclick="delC('${c.id}')">🗑️</button></div></div>`;
+  }).join('');
+}
+
+function callC(p){if(p)window.location.href='tel:'+p;else toast('Phone නෑ. Edit කරන්න.');}
+
+async function delC(id){
+  if(!confirm('Delete?'))return;
+  try{await db.from('clients').delete().eq('id',id);clients=clients.filter(c=>c.id!==id);renderClients();toast('Deleted ✓');}
+  catch(e){toast('Error!',true);}
+}
+
+function editC(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  document.getElementById('c-name').value=c.name;
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-bottles').value=c.monthly_bottles||'';
+  document.getElementById('c-day').value=c.delivery_day||'';
+  document.getElementById('c-price').value=c.price_per_bottle||35;
+  document.getElementById('m-client').dataset.eid=id;
+  document.getElementById('m-client').classList.add('open');
+}
+
+function renderOrders(){
+  document.getElementById('order-count').textContent=orders.length;
+  const list=document.getElementById('order-list');
+  if(!orders.length){list.innerHTML='<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Orders නෑ.<br>+ button add කරන්න.</div></div>';return;}
+  list.innerHTML=orders.map(o=>{
+    const c=clients.find(x=>x.id===o.client_id);
+    const tot=o.qty*o.price_per_bottle,bal=tot-(o.paid||0),pct=((o.stage+1)/6)*100;
+    return`<div class="order-card"><div class="order-top"><div class="order-ref">#${o.order_ref||o.id.slice(0,8)}</div><div class="badge ${o.stage===5?'badge-active':'badge-pending'}">${STAGES[o.stage]}</div></div>
+    <div class="order-client">${c?c.name:'Unknown'}</div>
+    <div class="order-meta"><div class="tag">📦 ${o.qty}btl</div><div class="tag">Rs.${tot.toLocaleString()}</div><div class="tag" style="color:${bal>0?'var(--red)':'var(--green)'}">Bal Rs.${bal.toLocaleString()}</div><div class="tag">📅${o.delivery_date||'N/A'}</div></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="progress-steps">${STAGES.map((s,i)=>`<div class="step-dot ${i<=o.stage?'done':''}">${s}</div>`).join('')}</div>
+    <div class="client-actions" style="margin-top:10px">${o.stage<5?`<button class="btn-sm btn-outline" onclick="nextStage('${o.id}')">▶ Next</button>`:''}${bal>0?`<button class="btn-sm btn-green" onclick="openPay('${o.id}')">💰 Pay</button>`:''}<button class="btn-sm btn-red" onclick="delO('${o.id}')">🗑️</button></div></div>`;
+  }).join('');
+}
+
+async function nextStage(id){
+  const o=orders.find(x=>x.id===id);if(!o||o.stage>=5)return;
+  try{await db.from('orders').update({stage:o.stage+1}).eq('id',id);o.stage++;renderOrders();toast('Updated ✓');}
+  catch(e){toast('Error!',true);}
+}
+
+async function delO(id){
+  if(!confirm('Delete?'))return;
+  try{await db.from('orders').delete().eq('id',id);orders=orders.filter(o=>o.id!==id);renderOrders();toast('Deleted ✓');}
+  catch(e){toast('Error!',true);}
+}
+
+function openPay(id){
+  payOrderId=id;
+  const o=orders.find(x=>x.id===id),c=clients.find(x=>x.id===o.client_id);
+  const tot=o.qty*o.price_per_bottle,bal=tot-(o.paid||0);
+  document.getElementById('pay-info').innerHTML=`<b>${c?c.name:''}</b><br>Total: Rs.${tot.toLocaleString()} | Paid: Rs.${(o.paid||0).toLocaleString()} | <b>Bal: Rs.${bal.toLocaleString()}</b>`;
+  document.getElementById('pay-amt').value=bal;
+  document.getElementById('m-pay').classList.add('open');
+}
+
+async function confirmPay(){
+  const o=orders.find(x=>x.id===payOrderId);
+  const amt=parseFloat(document.getElementById('pay-amt').value)||0;
+  if(!o)return;
+  const np=(o.paid||0)+amt;
+  try{await db.from('orders').update({paid:np}).eq('id',o.id);o.paid=np;closeM('m-pay');renderOrders();toast('Rs.'+amt.toLocaleString()+' marked! ✓');}
+  catch(e){toast('Error!',true);}
+}
+
+function renderDelivery(){
+  const td=new Date().getDate();
+  const list=clients.filter(c=>c.monthly_bottles>0).map(c=>({...c,dl:c.delivery_day>=td?c.delivery_day-td:(28-td+c.delivery_day)})).sort((a,b)=>a.dl-b.dl);
+  document.getElementById('delivery-list').innerHTML=list.length?list.map(c=>`<div class="delivery-row"><div class="delivery-left"><div class="delivery-dot">🏪</div><div><div class="delivery-name">${c.name}</div><div class="delivery-date">${c.dl===0?'⚡ අදමයි!':c.dl+' දිනකින්'} · Day ${c.delivery_day} · Rs.${(c.monthly_bottles*c.price_per_bottle).toLocaleString()}</div></div></div><div><div class="delivery-qty">${c.monthly_bottles}</div><div class="delivery-qty-label">bottles</div></div></div>`).join(''):'<div class="empty"><div class="empty-icon">🚚</div><div class="empty-text">Delivery schedule නෑ.</div></div>';
+}
+
+function openAdd(){
+  if(curPage==='orders'){
+    document.getElementById('o-client').innerHTML=clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    document.getElementById('o-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('m-order').classList.add('open');
+  }else{
+    document.getElementById('m-client').dataset.eid='';
+    ['c-name','c-phone','c-bottles','c-day'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('c-price').value='35';
+    document.getElementById('m-client').classList.add('open');
+  }
+}
+
+function closeM(id){document.getElementById(id).classList.remove('open');}
+
+async function saveClient(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){toast('Name ලියන්න!');return;}
+  const d={name,phone:document.getElementById('c-phone').value.trim(),monthly_bottles:parseInt(document.getElementById('c-bottles').value)||0,delivery_day:parseInt(document.getElementById('c-day').value)||1,price_per_bottle:parseFloat(document.getElementById('c-price').value)||35};
+  const eid=document.getElementById('m-client').dataset.eid;
+  try{
+    if(eid){await db.from('clients').update(d).eq('id',eid);const i=clients.findIndex(c=>c.id===eid);if(i>=0)clients[i]={...clients[i],...d};}
+    else{const{data:ins}=await db.from('clients').insert(d).select().single();if(ins)clients.push(ins);}
+    closeM('m-client');renderClients();toast('Client saved! ✓');
+  }catch(e){toast('Error! Table setup කරන්නද?',true);}
+}
+
+async function saveOrder(){
+  const cid=document.getElementById('o-client').value;
+  const qty=parseInt(document.getElementById('o-qty').value)||0;
+  const price=parseFloat(document.getElementById('o-price').value)||0;
+  if(!qty||!price){toast('Qty & Price ලියන්න!');return;}
+  const d={client_id:cid,qty,price_per_bottle:price,paid:parseFloat(document.getElementById('o-advance').value)||0,order_date:new Date().toISOString().split('T')[0],delivery_date:document.getElementById('o-date').value,stage:parseInt(document.getElementById('o-stage').value),order_ref:'ORD'+String(orders.length+1).padStart(3,'0')};
+  try{const{data:ins}=await db.from('orders').insert(d).select().single();if(ins)orders.unshift(ins);closeM('m-order');renderOrders();toast('Order added! ✓');}
+  catch(e){toast('Error! Table setup කරන්නද?',true);}
+}
+
+function copyTpl(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('Copied! 📋'));
+}
+
+function toast(msg,err=false){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' show';
+  setTimeout(()=>t.className='toast',2500);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+init();
+</script>
+</body>
+</html>
